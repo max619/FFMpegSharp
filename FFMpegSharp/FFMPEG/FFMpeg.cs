@@ -47,6 +47,18 @@ namespace FFMpegSharp.FFMPEG
             _ffmpegPath = ConfiguredRoot + $"\\{target}\\ffmpeg.exe";
         }
 
+        public FFMpeg(string ffPath)
+        {
+            _ffmpegPath = ffPath;
+            argumentBuilder = new FFArgumentBuilder();
+        }
+
+        public FFMpeg(string ffPath, IArgumentBuilder builder)
+        {
+            _ffmpegPath = ffPath;
+            argumentBuilder = builder;
+        }
+
         /// <summary>
         /// Returns the percentage of the current conversion progress.
         /// </summary>

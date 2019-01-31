@@ -18,6 +18,14 @@ namespace FFMpegSharp.FFMPEG
                 ConfiguredRoot = ConfiguredRoot.Substring(0, ConfiguredRoot.Length - 1);
         }
 
+        protected FFBase(string path)
+        {
+            ConfiguredRoot = path;
+
+            if (ConfiguredRoot.EndsWith("\\"))
+                ConfiguredRoot = ConfiguredRoot.Substring(0, ConfiguredRoot.Length - 1);
+        }
+
         /// <summary>
         ///     Is 'true' when an exception is thrown during process kill (for paranoia level users).
         /// </summary>

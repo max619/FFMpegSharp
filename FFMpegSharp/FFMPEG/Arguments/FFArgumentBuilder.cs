@@ -64,7 +64,7 @@ namespace FFMpegSharp.FFMPEG.Arguments
             StringBuilder sb = new StringBuilder();
 
             var inputA = new InputArgument(input);
-            var outputA = new OutputArgument();
+            var outputA = new OutputArgument(output);
 
             sb.Append(inputA.GetStringValue().Trim() + " ");
 

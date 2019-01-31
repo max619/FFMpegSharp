@@ -47,13 +47,13 @@ namespace FFMpegSharp.FFMPEG
             _ffmpegPath = ConfiguredRoot + $"\\{target}\\ffmpeg.exe";
         }
 
-        public FFMpeg(string ffPath)
+        public FFMpeg(string ffPath) : base(ffPath)
         {
             _ffmpegPath = ffPath;
             argumentBuilder = new FFArgumentBuilder();
         }
 
-        public FFMpeg(string ffPath, IArgumentBuilder builder)
+        public FFMpeg(string ffPath, IArgumentBuilder builder) : base(ffPath)
         {
             _ffmpegPath = ffPath;
             argumentBuilder = builder;
@@ -163,8 +163,8 @@ namespace FFMpegSharp.FFMPEG
             FFMpegHelper.ConversionSizeExceptionCheck(source);
 
             string args = "";
-            
-            var scale = VideoSize.Original == size ? 1 : 
+
+            var scale = VideoSize.Original == size ? 1 :
                 (double)source.Height / (int)size;
 
             var outputSize = new Size(
@@ -181,7 +181,7 @@ namespace FFMpegSharp.FFMPEG
             {
                 case VideoType.Mp4:
 
-                    args =       ArgumentsStringifier.Input(source) +
+                    args = ArgumentsStringifier.Input(source) +
                                  ArgumentsStringifier.Threads(multithreaded) +
                                  ArgumentsStringifier.Scale(outputSize) +
                                  ArgumentsStringifier.Video(VideoCodec.LibX264, 2400) +
@@ -190,7 +190,7 @@ namespace FFMpegSharp.FFMPEG
                                  ArgumentsStringifier.Output(output);
                     break;
                 case VideoType.Ogv:
-                    args =       ArgumentsStringifier.Input(source) +
+                    args = ArgumentsStringifier.Input(source) +
                                  ArgumentsStringifier.Threads(multithreaded) +
                                  ArgumentsStringifier.Scale(outputSize) +
                                  ArgumentsStringifier.Video(VideoCodec.LibTheora, 2400) +
@@ -200,7 +200,7 @@ namespace FFMpegSharp.FFMPEG
 
                     break;
                 case VideoType.Ts:
-                    args =       ArgumentsStringifier.Input(source) +
+                    args = ArgumentsStringifier.Input(source) +
                                  ArgumentsStringifier.Copy() +
                                  ArgumentsStringifier.BitStreamFilter(Channel.Video, Filter.H264_Mp4ToAnnexB) +
                                  ArgumentsStringifier.ForceFormat(VideoCodec.MpegTs) +
@@ -296,7 +296,7 @@ namespace FFMpegSharp.FFMPEG
         /// <param name="images">Image sequence collection</param>
         /// <returns>Output video information.</returns>
         public VideoInfo JoinImageSequence(FileInfo output, double frameRate = 30, params ImageInfo[] images)
-        {            
+        {
             var temporaryImageFiles = images.Select((image, index) =>
             {
                 FFMpegHelper.ConversionSizeExceptionCheck(Image.FromFile(image.FullName));
@@ -459,6 +459,16 @@ namespace FFMpegSharp.FFMPEG
             }
 
             return new VideoInfo(output);
+        }
+
+        public void ConvertWithNoInfo(ArgumentsContainer arguments, FileInfo input, FileInfo output)
+        {
+            var args = argumentBuilder.BuildArguments(arguments, input, output);
+
+            if (!RunProcess(args, output))
+            {
+                throw new FFMpegException(FFMpegExceptionType.Operation, "Could not replace the video audio.");
+            }
         }
 
         /// <summary>
